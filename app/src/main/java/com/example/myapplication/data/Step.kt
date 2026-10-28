@@ -13,7 +13,7 @@ import androidx.room.ForeignKey
 )
 
 
-class Step(
+data class Step(
     @PrimaryKey(autoGenerate = true) val id: Int=0,
     val recipeId: Int,
     val stepNumber: Int,

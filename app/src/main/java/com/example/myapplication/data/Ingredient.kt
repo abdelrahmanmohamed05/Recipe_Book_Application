@@ -14,7 +14,7 @@ import androidx.room.ForeignKey
 
 )
 
-class Ingredient (
+data class Ingredient (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val recipeId: Int,
     val name: String,
