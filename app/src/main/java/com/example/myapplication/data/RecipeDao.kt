@@ -4,6 +4,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RecipeDao {
@@ -45,16 +46,16 @@ interface RecipeDao {
     suspend fun deleteStepsOf(recipeId: Int)
 
     @Query("SELECT * FROM recipes")
-    suspend fun getRecipesWithDetails(): List<RecipeWithDetails>
+    fun getRecipesWithDetails(): Flow<List<RecipeWithDetails>>
 
     @Query("SELECT * FROM recipes WHERE id = :id")
-    suspend fun getRecipeWithDetails(id: Int): RecipeWithDetails?
+    fun getRecipeWithDetails(id: Int): Flow<RecipeWithDetails?>
 
     @Query("SELECT * FROM recipes WHERE title LIKE '%' || :query || '%'")
-    suspend fun searchWithDetails(query: String): List<RecipeWithDetails>
+    fun searchWithDetails(query: String): Flow<List<RecipeWithDetails>>
 
     @Query("SELECT * FROM recipes WHERE isFavorite = 1")
-    suspend fun getFavoritesWithDetails(): List<RecipeWithDetails>
+    fun getFavoritesWithDetails(): Flow<List<RecipeWithDetails>>
 
 
 

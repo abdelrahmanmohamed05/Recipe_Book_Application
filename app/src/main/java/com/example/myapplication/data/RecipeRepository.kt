@@ -1,18 +1,19 @@
 package com.example.myapplication.data
 
 import androidx.room.withTransaction
+import kotlinx.coroutines.flow.Flow
 
 class RecipeRepository(private val db: AppDatabase) {
 
     private val dao = db.recipeDao()
 
-    suspend fun getAllRecipes(): List<RecipeWithDetails> = dao.getRecipesWithDetails()
+    fun getAllRecipes(): Flow<List<RecipeWithDetails>> = dao.getRecipesWithDetails()
 
-    suspend fun getFavorites(): List<RecipeWithDetails> = dao.getFavoritesWithDetails()
+    fun getFavorites(): Flow<List<RecipeWithDetails>> = dao.getFavoritesWithDetails()
 
-    suspend fun getRecipe(id: Int): RecipeWithDetails? = dao.getRecipeWithDetails(id)
+    fun getRecipe(id: Int): Flow<RecipeWithDetails?> = dao.getRecipeWithDetails(id)
 
-    suspend fun search(query: String): List<RecipeWithDetails> = dao.searchWithDetails(query)
+    fun search(query: String): Flow<List<RecipeWithDetails>> = dao.searchWithDetails(query)
 
     suspend fun addRecipe(
         recipe: Recipe,
