@@ -20,6 +20,9 @@ class ViewModelFactory(
         } else if (modelClass.isAssignableFrom(RecipeDetailViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return RecipeDetailViewModel(repository, recipeId) as T
+        } else if (modelClass.isAssignableFrom(AddEditRecipeViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AddEditRecipeViewModel(repository, recipeId) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
