@@ -1,11 +1,13 @@
 package com.example.myapplication.ui.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.ui.detail.RecipeDetailScreen
+import com.example.myapplication.viewmodel.RecipeDetailViewModel
+import com.example.myapplication.viewmodel.ViewModelFactory
 
 @Composable
 fun DetailScreen(
@@ -13,21 +15,20 @@ fun DetailScreen(
     onBack: () -> Unit,
     onEdit: (Long) -> Unit
 ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Recipe Detail Screen (ID: $recipeId)", style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { onEdit(recipeId) }) {
-                Text("Edit Recipe")
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedButton(onClick = onBack) {
-                Text("Back")
-            }
+    val context = LocalContext.current
+    val viewModel: RecipeDetailViewModel = viewModel(
+        factory = ViewModelFactory(context, recipeId.toInt())
+    )
+    val details by viewModel.recipe.collectAsState()
+
+    RecipeDetailScreen(
+        details = details,
+        onBack = onBack,
+        onEdit = onEdit,
+        onToggleFavorite = { viewModel.toggleFavorite() },
+        onDelete = {
+            viewModel.deleteRecipe()
+            onBack()
         }
-    }
+    )
 }
