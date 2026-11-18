@@ -83,7 +83,8 @@ fun RecipeNavGraph() {
                 val id = idStr?.toLongOrNull()
                 AddEditScreen(
                     recipeId = id,
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    onDeleted = { navController.popBackStack(Screen.Home.route, inclusive = false) }
                 )
             }
         }
