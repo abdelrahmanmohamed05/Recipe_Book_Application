@@ -9,7 +9,7 @@ sealed class Screen(val route: String) {
         fun createRoute(id: Long) = "detail/$id"
     }
     
-    data object AddEdit : Screen("addEdit/{id?}") {
-        fun createRoute(id: Long? = null) = if (id != null) "addEdit/$id" else "addEdit/"
+    data object AddEdit : Screen("addEdit?id={id}") {
+        fun createRoute(id: Long? = null) = if (id != null) "addEdit?id=$id" else "addEdit"
     }
 }

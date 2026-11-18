@@ -22,7 +22,8 @@ data class AddEditRecipeUiState(
     val form: RecipeForm = RecipeForm(),
     val errors: FormErrors = FormErrors(),
     val isEditMode: Boolean = false,
-    val isSaved: Boolean = false
+    val isSaved: Boolean = false,
+    val isDeleted: Boolean = false
 )
 
 class AddEditRecipeViewModel(
@@ -172,6 +173,14 @@ class AddEditRecipeViewModel(
                 repository.addRecipe(recipe, ingredients, steps)
             }
             _uiState.value = _uiState.value.copy(isSaved = true)
+        }
+    }
+
+    fun deleteRecipe() {
+        val recipe = existingRecipe ?: return
+        viewModelScope.launch {
+            repository.deleteRecipe(recipe)
+            _uiState.value = _uiState.value.copy(isDeleted = true)
         }
     }
 }

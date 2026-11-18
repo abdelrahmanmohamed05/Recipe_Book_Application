@@ -40,14 +40,24 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditRecipeScreen(
-    initialForm: RecipeForm? = null,
-    onSave: (RecipeForm) -> Unit,
+    form: RecipeForm,
+    errors: FormErrors,
+    isEditMode: Boolean,
+    onTitleChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onCategoryChange: (String) -> Unit,
+    onPrepTimeChange: (String) -> Unit,
+    onServingsChange: (String) -> Unit,
+    onIngredientAdd: () -> Unit,
+    onIngredientChange: (Int, IngredientInput) -> Unit,
+    onIngredientRemove: (Int) -> Unit,
+    onStepAdd: () -> Unit,
+    onStepChange: (Int, String) -> Unit,
+    onStepRemove: (Int) -> Unit,
+    onSave: () -> Unit,
     onDelete: () -> Unit,
     onBack: () -> Unit
 ) {
-    val isEditMode = initialForm != null
-    var form by remember(initialForm) { mutableStateOf(initialForm ?: RecipeForm()) }
-    var errors by remember { mutableStateOf(FormErrors()) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -69,28 +79,22 @@ fun AddEditRecipeScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
-                FormField("Title", form.title, { form = form.copy(title = it) }, errors.title)
-            }
-            item {
-                FormField("Description", form.description, { form = form.copy(description = it) })
-            }
-            item {
-                FormField("Category", form.category, { form = form.copy(category = it) })
-            }
+            item { FormField("Title", form.title, onTitleChange, errors.title) }
+            item { FormField("Description", form.description, onDescriptionChange) }
+            item { FormField("Category", form.category, onCategoryChange) }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     FormField(
                         label = "Prep time (min)",
                         value = form.prepTime,
-                        onValueChange = { form = form.copy(prepTime = it.filter(Char::isDigit)) },
+                        onValueChange = onPrepTimeChange,
                         isNumber = true,
                         modifier = Modifier.weight(1f)
                     )
                     FormField(
                         label = "Servings",
                         value = form.servings,
-                        onValueChange = { form = form.copy(servings = it.filter(Char::isDigit)) },
+                        onValueChange = onServingsChange,
                         isNumber = true,
                         modifier = Modifier.weight(1f)
                     )
@@ -101,42 +105,25 @@ fun AddEditRecipeScreen(
             itemsIndexed(form.ingredients) { index, ingredient ->
                 IngredientRow(
                     ingredient = ingredient,
-                    onChange = { form = form.copy(ingredients = form.ingredients.replaceAt(index, it)) },
-                    onRemove = { form = form.copy(ingredients = form.ingredients.removeAtIndex(index)) }
+                    onChange = { onIngredientChange(index, it) },
+                    onRemove = { onIngredientRemove(index) }
                 )
             }
-            item {
-                AddRowButton("Add ingredient") {
-                    form = form.copy(ingredients = form.ingredients + IngredientInput())
-                }
-            }
+            item { AddRowButton("Add ingredient", onIngredientAdd) }
 
             item { SectionHeader("Steps", errors.steps) }
             itemsIndexed(form.steps) { index, step ->
                 StepRow(
                     number = index + 1,
                     text = step,
-                    onChange = { form = form.copy(steps = form.steps.replaceAt(index, it)) },
-                    onRemove = { form = form.copy(steps = form.steps.removeAtIndex(index)) }
+                    onChange = { onStepChange(index, it) },
+                    onRemove = { onStepRemove(index) }
                 )
             }
-            item {
-                AddRowButton("Add step") {
-                    form = form.copy(steps = form.steps + "")
-                }
-            }
+            item { AddRowButton("Add step", onStepAdd) }
 
             item {
-                Button(
-                    onClick = {
-                        errors = validate(form)
-                        if (!errors.hasErrors) {
-                            onSave(form)
-                            onBack()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Button(onClick = onSave, modifier = Modifier.fillMaxWidth()) {
                     Text("Save")
                 }
             }
@@ -269,31 +256,50 @@ private fun AddRowButton(text: String, onClick: () -> Unit) {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun AddRecipePreview() {
-    MaterialTheme {
-        AddEditRecipeScreen(onSave = {}, onDelete = {}, onBack = {})
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun EditRecipePreview() {
+private fun PreviewScreen(form: RecipeForm, isEditMode: Boolean) {
     MaterialTheme {
         AddEditRecipeScreen(
-            initialForm = RecipeForm(
-                title = "Pancakes",
-                description = "Soft breakfast pancakes",
-                category = "Breakfast",
-                prepTime = "20",
-                servings = "4",
-                ingredients = listOf(IngredientInput("Flour", "2 cups"), IngredientInput("Milk", "1 cup")),
-                steps = listOf("Mix the ingredients", "Cook on a hot pan")
-            ),
+            form = form,
+            errors = FormErrors(),
+            isEditMode = isEditMode,
+            onTitleChange = {},
+            onDescriptionChange = {},
+            onCategoryChange = {},
+            onPrepTimeChange = {},
+            onServingsChange = {},
+            onIngredientAdd = {},
+            onIngredientChange = { _, _ -> },
+            onIngredientRemove = {},
+            onStepAdd = {},
+            onStepChange = { _, _ -> },
+            onStepRemove = {},
             onSave = {},
             onDelete = {},
             onBack = {}
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AddRecipePreview() {
+    PreviewScreen(form = RecipeForm(), isEditMode = false)
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EditRecipePreview() {
+    PreviewScreen(
+        form = RecipeForm(
+            title = "Pancakes",
+            description = "Soft breakfast pancakes",
+            category = "Breakfast",
+            prepTime = "20",
+            servings = "4",
+            ingredients = listOf(IngredientInput("Flour", "2 cups"), IngredientInput("Milk", "1 cup")),
+            steps = listOf("Mix the ingredients", "Cook on a hot pan")
+        ),
+        isEditMode = true
+    )
 }
