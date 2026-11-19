@@ -17,7 +17,7 @@
         android:text="Favorite Recipes"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:textColor="?attr/colorOnBackground" />
 
     <include
         android:id="@+id/incSearchBar"

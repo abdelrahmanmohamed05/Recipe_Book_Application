@@ -1,11 +1,11 @@
 package com.example.myapplication.viewmodel
 
+import android.app.Application
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.data.AppDatabase
 import com.example.myapplication.data.RecipeRepository
-import com.example.myapplication.data.SettingsRepository
 
 class ViewModelFactory(
     private val context: Context,
@@ -27,9 +27,8 @@ class ViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return AddEditRecipeViewModel(repository, recipeId) as T
         } else if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
-            val settingsRepository = SettingsRepository(appContext)
             @Suppress("UNCHECKED_CAST")
-            return SettingsViewModel(settingsRepository) as T
+            return SettingsViewModel(appContext as Application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

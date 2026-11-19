@@ -1,6 +1,7 @@
 package com.example.myapplication.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.SettingsRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -8,9 +9,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class SettingsViewModel(private val settingsRepository: SettingsRepository) : ViewModel() {
+class SettingsViewModel(application: Application) : AndroidViewModel(application) {
+    private val settingsRepository = SettingsRepository(application)
 
-    // Expose dark mode preference as a read-only StateFlow for the UI
     val darkMode: StateFlow<Boolean> = settingsRepository.darkModeFlow
         .stateIn(
             scope = viewModelScope,
@@ -18,7 +19,6 @@ class SettingsViewModel(private val settingsRepository: SettingsRepository) : Vi
             initialValue = false
         )
 
-    // Update dark mode preference in DataStore when toggled
     fun setDarkMode(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.setDarkMode(enabled)
